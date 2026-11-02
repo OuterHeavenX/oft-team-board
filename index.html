@@ -235,7 +235,7 @@ let submittedAt=null;const LOCK_DAYS=30;
 const fmtD=d=>new Date(d).toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'});
 function lockUntil(){return submittedAt?new Date(new Date(submittedAt).getTime()+LOCK_DAYS*864e5):null}
 function subLocked(){return !!(submitted&&submittedAt&&lockUntil()>new Date())}
-function applyLock(){const L=subLocked();document.body.classList.toggle('ro',L);const b=$('#submit');if(!b||b.hidden)return;b.disabled=L;b.classList.toggle('done',L);if(L)b.textContent='✓ Submitted '+fmtD(submittedAt);else if(!b.classList.contains('armed'))b.textContent='Submit my ratings';
+function applyLock(){const L=subLocked();document.body.classList.toggle('ro',L&&['guide','ratings','today','future'].includes(view));const b=$('#submit');if(!b||b.hidden)return;b.disabled=L;b.classList.toggle('done',L);if(L)b.textContent='✓ Submitted '+fmtD(submittedAt);else if(!b.classList.contains('armed'))b.textContent='Submit my ratings';
 if(L&&['guide','ratings','today','future'].includes(view)&&!main.querySelector('.lockban'))main.insertAdjacentHTML('afterbegin',`<div class="lockban"><span class="ck">✓</span><p><b>Ratings submitted on ${fmtD(submittedAt)}.</b> They're locked until ${fmtD(lockUntil())}, when you can update and submit again. You can still look through everything.</p></div>`)}
 async function doSubmit(){clearTimeout(saveT);submitted=true;const err=await push();if(!err){submittedAt=new Date().toISOString();render()}return err}
 main.addEventListener('click',async e=>{const u=e.target.closest('[data-unlock]');if(!u)return;if(!u.classList.contains('armed')){u.classList.add('armed');u.textContent='Tap again to unlock';setTimeout(()=>{u.classList.remove('armed');u.textContent='Unlock'},4000);return}

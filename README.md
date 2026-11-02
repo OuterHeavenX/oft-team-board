@@ -4,4 +4,4 @@ Private grading board for the OFT team. Graders sign in with Google, rate each t
 
 - **Hosting:** Cloudflare Pages, auto-deployed from `main`. No build step; the site is the single `index.html`.
 - **Backend:** Supabase project "OFT Team Reviews" (Google sign-in, approved-email list, row-level security).
-- **Access:** only emails in the `reviewers` table can read or write anything. Role `grader` sees only their own work; role `manager` also sees everyone's.
+- **Access:** only emails in the `reviewers` table can read or write anything. Roles: `grader` sees only their own work; `manager` (Admin) also sees the dashboard; `viewer` sees only the dashboard and cannot grade; `owner` (Jimmy) can also manage who has access.

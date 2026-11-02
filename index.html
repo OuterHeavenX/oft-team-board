@@ -49,12 +49,15 @@ header{background:#151d38}.sub{color:#aab4d4}nav button{color:#aab4d4}nav button
 .stat.hero{background:linear-gradient(138.84deg,#3c539f 0%,#253780 100%);border-color:#253780}.stat.hero span{color:#c9d2ef}
 .primary{background:#e07f30;border-color:#e07f30;color:#fff}.primary:hover{background:#c96d22;border-color:#c96d22}
 .rankrow.lifted .card{box-shadow:0 14px 30px rgba(21,29,56,.25)}#gate h1{color:var(--ink)}#gate .sub{color:var(--mute)}
+.rtable{table-layout:fixed;min-width:1000px}.rtable th:first-child,.rtable td:first-child{width:190px}.rtable th:not(:first-child),.rtable td:not(:first-child){text-align:center;white-space:normal}.rtable th{vertical-align:bottom;line-height:1.25}
+tbody tr:nth-child(even) td{background:#f1f4fa}tbody tr:hover td{background:#e4eaf8}
+.prog{display:flex;align-items:center;gap:8px;flex:0 1 280px;min-width:170px}.prog[hidden]{display:none}.ptrack{flex:1;height:10px;border-radius:5px;background:var(--surf2);border:1px solid var(--line);overflow:hidden}.ptrack i{display:block;height:100%;width:0;background:var(--brand);transition:width .25s}.prog.done .ptrack i{background:#2e9e6b}#ppct{font-size:13px;font-weight:700;white-space:nowrap}.prog.done #ppct{color:#2e9e6b}#submit.armed{background:var(--lo);border-color:var(--lo);color:#fff}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script>window.supabase||document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"><\/script>')</script></head><body class="locked">
 <div id="gate"><h1>OFT Team Board</h1><p class="sub" id="gmsg">Sign in with your company Google account.</p><button class="primary" id="gbtn" style="max-width:280px">Continue with Google</button></div>
 <header><h1>OFT Team Board</h1><p class="sub">Rate your team and rank their growth.</p>
 <nav aria-label="Views"><button data-view="guide">Guide</button><button data-view="ratings">Ratings</button><button data-view="today">Skill today</button><button data-view="future">In 2 years</button></nav></header>
-<div class="bar"><button id="undo">Undo</button><button id="submit">Submit my ratings</button><button id="out">Sign out</button><span class="sp" id="status" role="status">Loading…</span></div>
+<div class="bar"><button id="undo">Undo</button><button id="submit">Submit my ratings</button><button id="out">Sign out</button><div id="prog" class="prog" role="status" aria-label="Your progress"><div class="ptrack"><i></i></div><span id="ppct">0% done</span></div><span class="sp" id="status" role="status">Loading…</span></div>
 <main id="main"></main>
 <dialog id="editor"></dialog>
 <script>
@@ -71,20 +74,20 @@ const avg=i=>{const v=state.scores[i].filter(x=>x!=='');return v.length?v.reduce
 const band=v=>v==null?'s-none':v<5?'s-lo':v>=7.5?'s-hi':'s-mid';
 const ini=n=>n.split(' ').map(w=>w[0]).join('');
 function snap(){history.push(JSON.stringify(state));if(history.length>40)history.shift();$('#undo').disabled=false}
-function save(){status.textContent='Saving…';submitted=false;clearTimeout(saveT);saveT=setTimeout(push,600)}
+function save(){updateProg();status.textContent='Saving…';submitted=false;clearTimeout(saveT);saveT=setTimeout(push,600)}
 async function push(){const{error}=await sb.from('responses').upsert({reviewer_id:me.id,payload:state,submitted},{onConflict:'reviewer_id'});status.textContent=error?'Not saved: '+error.message:submitted?'Submitted':'Saved · draft'}
 const opts=v=>'<option value="">–</option>'+Array.from({length:10},(_,i)=>`<option ${v===i+1?'selected':''}>${i+1}</option>`).join('');
 const grip=i=>`<button class="grip" data-id="${i}" aria-label="Drag ${names[i]}. Arrow keys also move them.">⠿</button>`;
 function card(i,rank){const a=avg(i),b=band(a);return `<div class="cardtop">${grip(i)}<span class="ini ${b}">${ini(names[i])}</span><span class="name">${names[i]}</span>${rank?`<span class="avg">${a==null?'':a.toFixed(1)}</span><button class="move" data-edit="${i}" aria-label="Edit ${names[i]} ratings">Edit</button>`:''}</div>${rank?'':`<div class="meter ${b}"><i style="width:${a==null?0:a*10}%"></i></div><div class="detail"><span>Skill <b>${state.scores[i][0]||'–'}</b> · Avg <b>${a==null?'–':a.toFixed(1)}</b></span><button data-edit="${i}">Rate</button></div>`}`}
 function applyFilter(){const t=q.trim().toLowerCase();document.querySelectorAll('.canvas .card').forEach(c=>c.classList.toggle('dim',!!t&&!names[+c.dataset.person].toLowerCase().includes(t)))}
 function scored(){return state.scores.flat().filter(x=>x!=='').length}
-function render(){
+function render(){updateProg();
 document.querySelectorAll('nav button').forEach(b=>{const on=b.dataset.view===view;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on)});$('#undo').disabled=!history.length;
 if(view==='dash'){renderDash();return}
 if(view==='people'){renderPeople();return}
 if(view==='guide'){renderGuide();return}
 if(view==='ratings'){const ord=names.map((_,i)=>i);if(sortBy==='avg')ord.sort((a,b)=>(avg(b)??-1)-(avg(a)??-1));
-main.innerHTML=`<div class="bar" style="padding:0 0 12px"><label>Sort by <select id="sort" style="padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--surf)"><option value="name">Name</option><option value="avg">Average</option></select></label><span class="sp">Rate 1 to 10. Scores stay with each person.</span></div><div class="tablewrap"><table><thead><tr><th>Person</th>`+labels.map(l=>`<th>${l}</th>`).join('')+'<th>Overall skill</th><th>Avg</th></tr></thead><tbody>'+ord.map(i=>`<tr><td>${names[i]}</td>`+labels.map((l,j)=>`<td><select aria-label="${names[i]}: ${l}" data-score="${i},${j}">${opts(state.scores[i][j])}</select></td>`).join('')+`<td><select aria-label="${names[i]}: Overall skill level" data-ov="${i}">${opts(state.overall[i])}</select></td><td class="a" data-avg="${i}">${avg(i)==null?'–':avg(i).toFixed(1)}</td></tr>`).join('')+'</tbody></table></div>';$('#sort').value=sortBy}
+main.innerHTML=`<div class="bar" style="padding:0 0 12px"><label>Sort by <select id="sort" style="padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--surf)"><option value="name">Name</option><option value="avg">Average</option></select></label><span class="sp">Rate 1 to 10. Scores stay with each person.</span></div><div class="tablewrap"><table class="rtable"><thead><tr><th>Person</th>`+labels.map(l=>`<th>${l}</th>`).join('')+'<th>Overall skill</th><th>Avg</th></tr></thead><tbody>'+ord.map(i=>`<tr><td>${names[i]}</td>`+labels.map((l,j)=>`<td><select aria-label="${names[i]}: ${l}" data-score="${i},${j}">${opts(state.scores[i][j])}</select></td>`).join('')+`<td><select aria-label="${names[i]}: Overall skill level" data-ov="${i}">${opts(state.overall[i])}</select></td><td class="a" data-avg="${i}">${avg(i)==null?'–':avg(i).toFixed(1)}</td></tr>`).join('')+'</tbody></table></div>';$('#sort').value=sortBy}
 else{main.innerHTML=`<div class="bar" style="padding:0 0 12px"><p class="hint" style="margin:0;flex:1">${view==='today'?'Current skill':'Projected skill in two years'}: #1 is strongest. Drag the handle, or use the arrows. Each list is separate.</p>${view==='today'?'<button id="fill">Order by average rating</button>':''}</div>${state.touched[view]?'':'<div class="notice">Starting order follows your employee list. Arrange the names to set your ranking.</div>'}<div class="ranklist">`+state[view].map((i,r)=>`<div class="rankrow" data-person="${i}"><span class="ranknum">${r+1}</span><article class="card">${card(i,true)}</article><button class="move" data-step="${i},-1" aria-label="Move ${names[i]} up" ${r===0?'disabled':''}>↑</button><button class="move" data-step="${i},1" aria-label="Move ${names[i]} down" ${r===N-1?'disabled':''}>↓</button></div>`).join('')+'</div>'}
 guideBars()}
 function reorder(id,to){const a=state[view],f=a.indexOf(id);a.splice(f,1);a.splice(to,0,id);state.touched[view]=true}
@@ -119,14 +122,14 @@ const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 function gate(m){document.body.classList.add('locked');if(m)$('#gmsg').textContent=m}
 $('#gbtn').onclick=()=>!sb?location.reload():sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname,queryParams:{hd:'idealimpactinc.com',prompt:'select_account'}}});
 $('#out').onclick=async()=>{await sb.auth.signOut();location.reload()};
-$('#submit').onclick=async()=>{clearTimeout(saveT);submitted=true;await push()};
+$('#submit').onclick=async e=>{const b=e.currentTarget,p=progress();if(p<100&&!b.classList.contains('armed')){b.classList.add('armed');b.textContent=`Only ${p}% done. Tap again to submit`;setTimeout(()=>{b.classList.remove('armed');b.textContent='Submit my ratings'},5000);return}b.classList.remove('armed');b.textContent='Submit my ratings';clearTimeout(saveT);submitted=true;await push()};
 async function boot(){if(!sb)return gate('Sign-in could not load. Check your connection and refresh the page.');const{data:{session}}=await sb.auth.getSession();if(!session)return gate();
 const email=(session.user.email||'').toLowerCase();const{data:rv}=await sb.from('reviewers').select('role,active').eq('email',email).maybeSingle();
 if(!rv||!rv.active){await sb.auth.signOut();return gate(email+' does not have access to this board.')}
 me=session.user;role=rv.role;const{data:row}=await sb.from('responses').select('payload,submitted').eq('reviewer_id',me.id).maybeSingle();
 if(row&&valid(row.payload)){state=row.payload;submitted=row.submitted}if(!state.overall)state.overall=Array(N).fill('');if(!state.notes)state.notes=Array(N).fill('');
 document.body.classList.remove('locked');$('header .sub').textContent='Signed in as '+email;status.textContent=submitted?'Submitted':'Saved';
-gs=firstGap();if(role==='viewer'){$('nav').innerHTML='<button data-view="dash">Dashboard</button>';$('#undo').hidden=true;$('#submit').hidden=true;status.textContent='';view='dash'}else if(role==='manager'||role==='owner'){$('nav').insertAdjacentHTML('afterbegin','<button data-view="dash">Dashboard</button>');if(role==='owner')$('nav').insertAdjacentHTML('beforeend','<button data-view="people">People</button>');view='dash'}else{guideOn=true;view='guide'}
+gs=firstGap();if(role==='viewer'){$('nav').innerHTML='<button data-view="dash">Dashboard</button>';$('#prog').hidden=true;$('#undo').hidden=true;$('#submit').hidden=true;status.textContent='';view='dash'}else if(role==='manager'||role==='owner'){$('nav').insertAdjacentHTML('afterbegin','<button data-view="dash">Dashboard</button>');if(role==='owner')$('nav').insertAdjacentHTML('beforeend','<button data-view="people">People</button>');view='dash'}else{guideOn=true;view='guide'}
 render()}
 let dsort='overall',dperson=0,dcache=null;
 async function renderDash(){if(!dcache){main.innerHTML='<p class="hint">Loading dashboard…</p>';
@@ -183,5 +186,7 @@ const rm=e.target.closest('[data-prm]');if(rm){if(!rm.classList.contains('armed'
 const rs=e.target.closest('[data-prs]');if(rs){setPerson({email:rs.dataset.prs,role:rs.dataset.prsRole==='owner'?'grader':rs.dataset.prsRole,active:true},`Restored ${rs.dataset.prs}.`)}});
 document.addEventListener('change',e=>{const s=e.target.closest('[data-prole]');if(s&&view==='people')setPerson({email:s.dataset.prole,role:s.value,active:true},`${s.dataset.prole} is now ${RL[s.value]}.`)});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='pemail')$('#padd').click()});
+function progress(){const f=state.scores.flat().filter(v=>v!=='').length+(state.overall||[]).filter(v=>v!=='').length+(state.touched.today?1:0)+(state.touched.future?1:0),t=N*(B+1)+2;return f>=t?100:Math.floor(f/t*100)}
+function updateProg(){const el=document.getElementById('prog');if(!el)return;const p=progress();el.querySelector('i').style.width=p+'%';$('#ppct').textContent=p===100?'100% · ready to submit':p+'% done';el.classList.toggle('done',p===100);el.title=p===100?'Everything is rated and ranked':'Rate every person, then set both rankings, to reach 100%'}
 boot();
 </script></body></html>

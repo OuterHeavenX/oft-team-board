@@ -63,10 +63,11 @@ body.ro main select:not(#sort):not(#dsort):not(#cperson):not(#cgrader),body.ro m
 #submit.done{background:#2e9e6b;border-color:#2e9e6b;color:#fff;opacity:1}.st.done{white-space:nowrap}
 #copyToday{margin-top:8px}#copyToday.armed{background:var(--lo);border-color:var(--lo);color:#fff}body.ro main #copyToday{pointer-events:none;opacity:.55}
 .dlt{font-weight:700;white-space:nowrap}.dlt.up{color:#2e9e6b}.dlt.dn{color:#c4421a}
+header{position:sticky}.brandlogo{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:20px;height:46px;width:auto;background:#fff;padding:6px 10px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.18)}#gate .gatelogo{height:56px;width:auto;margin-bottom:10px}@media(max-width:600px){.brandlogo{height:34px;padding:4px 7px;right:14px;top:calc(12px + env(safe-area-inset-top,0px))}header h1{padding-right:130px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script>window.supabase||document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"><\/script>')</script></head><body class="locked">
-<div id="gate"><h1>OFT Team Board</h1><p class="sub" id="gmsg">Sign in with your company Google account.</p><button class="primary" id="gbtn" style="max-width:280px">Continue with Google</button></div>
-<header><h1>OFT Team Board</h1><p class="sub">Rate your team and rank their growth.</p>
+<div id="gate"><img class="gatelogo" src="logo.png" alt="Ideal Impact Inc."><h1>OFT Team Board</h1><p class="sub" id="gmsg">Sign in with your company Google account.</p><button class="primary" id="gbtn" style="max-width:280px">Continue with Google</button></div>
+<header><img class="brandlogo" src="logo.png" alt="Ideal Impact Inc."><h1>OFT Team Board</h1><p class="sub">Rate your team and rank their growth.</p>
 <nav aria-label="Views"><button data-view="guide">Guide</button><button data-view="ratings">Ratings</button><button data-view="today">Skill today</button><button data-view="future">In 2 years</button></nav></header>
 <div class="bar"><button id="undo">Undo</button><button id="submit">Submit my ratings</button><button id="out">Sign out</button><div id="prog" class="prog" role="status" aria-label="Your progress"><div class="ptrack"><i></i></div><span id="ppct">0% done</span><button id="pleft" class="textbtn" type="button" hidden>See what&#39;s left</button></div><span class="sp" id="status" role="status">Loading…</span></div>
 <main id="main"></main>

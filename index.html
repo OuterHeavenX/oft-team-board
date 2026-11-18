@@ -82,6 +82,23 @@ html,body{overflow-x:clip}
 .ta-num{margin:6px 0 0;padding-left:22px;display:grid;gap:6px}.ta-modes{margin:0;display:grid;gap:4px}.ta-modes dt{font-weight:800;color:#0f8f7e;font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin-top:6px}.ta-modes dd{margin:0}
 .ta-toc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0}.ta-toc ol{margin:8px 0 0;padding-left:22px;display:grid;gap:6px}@media(min-width:700px){.ta-toc ol{grid-template-columns:1fr 1fr;column-gap:24px}}.ta-toc a{font-weight:700;color:var(--brand)}.ta-toc span{display:block;font-size:12px;color:var(--mute)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.tres-sum{font-size:13px;color:var(--mute);margin:0 0 10px;font-weight:600}
+.tres-g{background:var(--surf);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 12px}
+.tres-h{display:flex;align-items:center;gap:10px;margin-bottom:4px}.tres-h>div{flex:1;min-width:0}.tres-h b{display:block;font-size:15px}.tres-h span{display:block;font-size:12px;color:var(--mute)}
+.tres-h .tres-go{flex:none;width:auto;margin:0;padding:8px 14px;background:#e07f30;border-color:#e07f30;color:#fff;font-weight:700}
+.tres-hit{display:block;width:100%;text-align:left;background:#f6f8fb;border:1px solid var(--line);border-radius:9px;padding:8px 11px;margin:6px 0 0;font:inherit;color:inherit;white-space:normal}
+.tres-hit:hover{border-color:#0f8f7e;background:#eef7f5}
+.tres-hit small{display:block;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#0f8f7e;margin-bottom:2px}
+.tres-hit span{display:block;font-size:14px;line-height:1.45}
+.tres-more{display:block;width:100%;margin:8px 0 0;padding:8px;font-weight:700;color:var(--brand);background:none}
+.twrap mark,.tart mark.thl{background:#ffe58a;color:inherit;border-radius:3px;padding:0 1px}
+.tart .thit-on mark.thl{background:#ffb347}
+.tart .thit-on{outline:3px solid #e07f30;outline-offset:3px;border-radius:6px;scroll-margin-top:calc(var(--hh,190px) + 70px)}
+.tfind{position:sticky;top:var(--hh,0px);z-index:6;display:flex;gap:6px;align-items:center;background:var(--bg);padding:8px 0;margin:0 0 4px}
+.tfind input{flex:1;min-width:0;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surf);font:inherit}
+.tfind .tfc{font-size:12px;color:var(--mute);white-space:nowrap;min-width:52px;text-align:right;font-weight:600}
+.tfind button{flex:none;width:38px;padding:8px 0;margin:0;font-weight:700}
+.tfind button:disabled{opacity:.4}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script>window.supabase||document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"><\/script>')</script></head><body class="locked">
 <div id="gate"><img class="gatelogo" src="logo.png" alt="Ideal Impact Inc."><h1>OFT Team Board</h1><p class="sub" id="gmsg">Sign in with your company Google account.</p><button class="primary" id="gbtn" style="max-width:280px">Continue with Google</button></div>
 <header><img class="brandlogo" src="logo.png" alt="Ideal Impact Inc."><h1>OFT Team Board</h1><p class="sub">Rate your team and rank their growth.</p>
@@ -287,13 +304,33 @@ let tq='',tcache=null;
 const fsize=n=>n==null?'':n>1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB';
 const ext=n=>((n||'').split('.').pop()||'file').slice(0,4).toUpperCase();
 async function renderTraining(msg){if(!tcache){main.innerHTML='<p class="hint">Loading training…</p>';const{data,error}=await sb.from('training').select('*').order('created_at',{ascending:false});if(view!=='training')return;if(error){main.innerHTML='<p class="hint">Could not load training: '+esc(error.message)+'</p>';return}tcache=data||[]}
-const own=role==='owner',t=tq.trim().toLowerCase(),items=tcache.filter(x=>!t||[x.title,x.category,x.description,x.file_name,(x.body||'').replace(/<[^>]+>/g,' ')].join(' ').toLowerCase().includes(t)),cats=[...new Set(items.map(x=>x.category))].sort((a,b)=>a.localeCompare(b));
-main.innerHTML=`<div class="twrap"><h2 class="gname">Training</h2><p class="hint">Training and troubleshooting materials for the OFT team. Tap <b>Read</b> to open a guide here, or <b>Open</b> for a file.</p>
-
-${tcache.length>3?`<input class="tsearch" id="tq" type="search" placeholder="Search training" value="${esc(tq)}" aria-label="Search training">`:''}
-${cats.map(c=>`<div class="tcat">${esc(c)}</div><div class="tlist">${items.filter(x=>x.category===c).map(x=>`<div class="titem"><span class="ticon">${x.body?'GUIDE':esc(ext(x.file_name))}</span><div class="tbody"><b>${esc(x.title)}</b>${x.description?`<p>${esc(x.description)}</p>`:''}<small>${esc(x.file_name||'')}${x.file_size?' · '+fsize(x.file_size):''} · added ${fmtD(x.created_at)}</small></div><div class="tacts">${x.body?`<button class="primary" data-tread="${esc(x.id)}">Read</button>`:''}${x.file_path?`<button class="${x.body?'':'primary'}" data-topen="${esc(x.id)}">${x.body?'PDF':'Open'}</button>`:''}${own?`<button data-tdel="${esc(x.id)}">Remove</button>`:''}</div></div>`).join('')}</div>`).join('')||`<p class="hint">${t?'Nothing matches your search.':'No training materials yet.'}</p>`}</div>`;
-const q=$('#tq');if(q&&t){q.focus();q.setSelectionRange(q.value.length,q.value.length)}}
-main.addEventListener('input',e=>{if(e.target.id==='tq'){tq=e.target.value;renderTraining()}});
+main.innerHTML=`<div class="twrap"><h2 class="gname">Training</h2><p class="hint">Training and troubleshooting materials for the OFT team. Search looks inside every guide. Tap <b>Read</b> to open one.</p>${msg?`<p class="hint" style="color:var(--brand);font-weight:600">${esc(msg)}</p>`:''}
+<input class="tsearch" id="tq" type="search" placeholder="Search all training — e.g. static pressure, damper, CO2" value="${esc(tq)}" aria-label="Search all training" autocomplete="off" enterkeyhint="search"><div id="tres" aria-live="polite"></div><div id="tlistw"></div></div>`;
+tupdate()}
+function tlistHTML(items){const own=role==='owner',cats=[...new Set(items.map(x=>x.category))].sort((a,b)=>a.localeCompare(b));
+return cats.map(c=>`<div class="tcat">${esc(c)}</div><div class="tlist">${items.filter(x=>x.category===c).map(x=>`<div class="titem"><span class="ticon">${x.body?'GUIDE':esc(ext(x.file_name))}</span><div class="tbody"><b>${esc(x.title)}</b>${x.description?`<p>${esc(x.description)}</p>`:''}<small>${esc(x.file_name||'')}${x.file_size?' · '+fsize(x.file_size):''} · added ${fmtD(x.created_at)}</small></div><div class="tacts">${x.body?`<button class="primary" data-tread="${esc(x.id)}">Read</button>`:''}${x.file_path?`<button class="${x.body?'':'primary'}" data-topen="${esc(x.id)}">${x.body?'PDF':'Open'}</button>`:''}${own?`<button data-tdel="${esc(x.id)}">Remove</button>`:''}</div></div>`).join('')}</div>`).join('')||'<p class="hint">No training materials yet.</p>'}
+/* ---- full-text search across every guide ---- */
+const TLEAF='h1,h2,h3,h4,p,li,td,th,figcaption,dt,dd,caption,label,blockquote,div';
+const tnorm=t=>(t||'').toLowerCase().replace(/\s+/g,' ').trim();
+const twords=q=>[...new Set(tnorm(q).replace(/["“”]/g,'').split(' ').filter(Boolean))];
+const twre=w=>new RegExp(w.map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).sort((a,b)=>b.length-a.length).join('|'),'gi');
+function ttext(el){let o='';const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement&&n.parentElement.closest('style,script')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});while(w.nextNode())o+=w.currentNode.nodeValue+' ';return o.replace(/\s+/g,' ').trim()}
+function tleaves(root){return[...root.querySelectorAll(TLEAF)].filter(el=>!el.closest('style')&&!el.querySelector(TLEAF)&&ttext(el))}
+let tidx=null,tqT=0;const topen=new Set();
+function tbuild(){if(tidx&&tidx.src===tcache)return tidx;const P=new DOMParser();tidx=tcache.map(x=>{let blocks=[];if(x.body){const d=P.parseFromString('<div id="tdroot">'+x.body+'</div>','text/html');let h=x.title;blocks=tleaves(d.getElementById('tdroot')).map(el=>{const t=ttext(el);if(/^H[1-4]$/.test(el.tagName))h=t;return{t,l:tnorm(t),h}})}const meta=tnorm([x.title,x.category,x.description,x.file_name].join(' '));return{x,blocks,meta,all:meta+' '+blocks.map(b=>b.l).join(' ')}});tidx.src=tcache;return tidx}
+function tsearch(q){const w=twords(q);if(!w.length)return[];return tbuild().map(g=>({g,hits:g.blocks.map((b,i)=>w.every(x=>b.l.includes(x))?i:-1).filter(i=>i>-1)})).filter(r=>r.hits.length||w.every(x=>r.g.all.includes(x)))}
+function thl(t,w){const re=twre(w);let o='',p=0,m;while((m=re.exec(t))){o+=esc(t.slice(p,m.index))+'<mark>'+esc(m[0])+'</mark>';p=m.index+m[0].length;if(!m[0].length)re.lastIndex++}return o+esc(t.slice(p))}
+function tsnip(t,w){const l=t.toLowerCase();let i=Math.min(...w.map(x=>{const k=l.indexOf(x);return k<0?1e9:k}));if(i>=1e9)i=0;const a=Math.max(0,i-60),b=Math.min(t.length,i+140);let s=t.slice(a,b);if(a)s=s.replace(/^\S*\s/,'');if(b<t.length)s=s.replace(/\s\S*$/,'');return(a?'… ':'')+thl(s,w)+(b<t.length?' …':'')}
+function tupdate(){const R=$('#tres'),L=$('#tlistw');if(!R||!L)return;const q=tq.trim();if(q.length<2){R.innerHTML='';L.innerHTML=tlistHTML(tcache);return}
+const w=twords(q),res=tsearch(q),n=res.reduce((s,r)=>s+r.hits.length,0);L.innerHTML='';
+if(!res.length){R.innerHTML=`<p class="tres-sum">No matches for “${esc(q)}”. Try fewer or different words.</p>`;return}
+R.innerHTML=`<p class="tres-sum">${n?`${n} match${n===1?'':'es'} in ${res.filter(r=>r.hits.length).length} guide${res.filter(r=>r.hits.length).length===1?'':'s'}`:'Matches found'} for “${esc(q)}”</p>`+res.map(r=>{const x=r.g.x,all=topen.has(x.id),show=all?r.hits:r.hits.slice(0,6);
+return`<div class="tres-g"><div class="tres-h"><div><b>${thl(x.title,w)}</b><span>${r.hits.length?`${r.hits.length} match${r.hits.length===1?'':'es'}`:'Matches the title or description'}</span></div>${x.body?`<button class="tres-go" data-tread="${esc(x.id)}"${r.hits.length?` data-hit="${r.hits[0]}"`:''}>Open guide</button>`:x.file_path?`<button class="tres-go" data-topen="${esc(x.id)}">Open</button>`:''}</div>
+${show.map(i=>{const b=r.g.blocks[i];return`<button class="tres-hit" data-tread="${esc(x.id)}" data-hit="${i}"><small>${esc(b.h.length>80?b.h.slice(0,78)+'…':b.h)}</small><span>${tsnip(b.t,w)}</span></button>`}).join('')}
+${r.hits.length>show.length?`<button class="tres-more" data-tmore="${esc(x.id)}">Show all ${r.hits.length} matches</button>`:''}</div>`}).join('')}
+main.addEventListener('input',e=>{if(e.target.id==='tq'){tq=e.target.value;clearTimeout(tqT);tqT=setTimeout(tupdate,120)}else if(e.target.id==='gfq'){clearTimeout(tqT);const v=e.target.value;tqT=setTimeout(()=>gfApply(v),120)}});
+main.addEventListener('keydown',e=>{if(e.key!=='Enter')return;if(e.target.id==='tq'){e.preventDefault();clearTimeout(tqT);tupdate();const f=$('#tres .tres-hit, #tres .tres-go');if(f)f.click()}else if(e.target.id==='gfq'){e.preventDefault();clearTimeout(tqT);if(tnorm(e.target.value)!==tnorm(gf.q))gfApply(e.target.value);else gfStep(e.shiftKey?-1:1)}});
+main.addEventListener('click',e=>{const m=e.target.closest('[data-tmore]');if(m){topen.add(m.dataset.tmore);tupdate()}});
 main.addEventListener('click',async e=>{if(view!=='training'&&view!=='tread')return;
 const o=e.target.closest('[data-topen]');if(o){const x=tcache.find(r=>r.id===o.dataset.topen);if(!x)return;const w=window.open('','_blank');o.textContent='Opening…';const{data,error}=await sb.storage.from('training').createSignedUrl(x.file_path,3600);o.textContent='Open';if(error||!data){if(w)w.close();alertMsg('Could not open the file: '+(error?error.message:'unknown error'));return}if(w)w.location=data.signedUrl;else location.href=data.signedUrl;return}
 const d=e.target.closest('[data-tdel]');if(d){if(!d.classList.contains('armed')){d.classList.add('armed');d.textContent='Tap again';setTimeout(()=>{d.classList.remove('armed');d.textContent='Remove'},4000);return}const x=tcache.find(r=>r.id===d.dataset.tdel);d.textContent='Removing…';if(x.file_path)await sb.storage.from('training').remove([x.file_path]);const{error}=await sb.from('training').delete().eq('id',x.id);tcache=null;renderTraining(error?'Could not remove: '+error.message:'Removed “'+x.title+'”.');return}
@@ -309,11 +346,23 @@ function syncNavToggle(){const a=document.querySelector('nav button.active'),t=$
 let treadId=null;const timgCache={};
 async function renderTRead(){if(!tcache){main.innerHTML='<p class="hint">Loading…</p>';const{data}=await sb.from('training').select('*').order('created_at',{ascending:false});tcache=data||[]}
 const x=tcache.find(r=>r.id===treadId);if(!x||!x.body){view='training';renderTraining();return}
-main.innerHTML=`<div class="tart"><button class="tback" data-tback>← All training</button>${x.body}${x.file_path?`<p style="text-align:center;margin:18px 0"><button data-topen="${esc(x.id)}">Open the original PDF</button></p>`:''}<p style="text-align:center"><button class="tback" data-tback>← All training</button></p></div>`;scrollTo(0,0);
+const fq=tfind?tfind.q:'';main.innerHTML=`<div class="tart"><button class="tback" data-tback>← All training</button><div class="tfind" role="search"><input id="gfq" type="search" placeholder="Find in this guide" value="${esc(fq)}" aria-label="Find in this guide" autocomplete="off" enterkeyhint="search"><span id="gfc" class="tfc" aria-live="polite"></span><button type="button" data-gf="-1" aria-label="Previous match">↑</button><button type="button" data-gf="1" aria-label="Next match">↓</button></div><div class="tbodyart">${x.body}</div>${x.file_path?`<p style="text-align:center;margin:18px 0"><button data-topen="${esc(x.id)}">Open the original PDF</button></p>`:''}<p style="text-align:center"><button class="tback" data-tback>← All training</button></p></div>`;scrollTo(0,0);if(tfind){const t=tfind;tfind=null;gfApply(t.q,t.hit)}else{gf={q:'',hits:[],i:-1,leaves:[],until:0};gfBar()}
 let im=timgCache[x.id];if(!im){const{data}=await sb.from('training_images').select('key,mime,data').eq('training_id',x.id);im=timgCache[x.id]=Object.fromEntries((data||[]).map(r=>[r.key,`data:${r.mime};base64,${r.data}`]))}
 if(view!=='tread'||treadId!==x.id)return;main.querySelectorAll('img[data-k]').forEach(i=>{if(im[i.dataset.k])i.src=im[i.dataset.k]})}
-main.addEventListener('click',e=>{const r=e.target.closest('[data-tread]');if(r){treadId=r.dataset.tread;view='tread';render();return}if(e.target.closest('[data-tback]')){view='training';render();scrollTo(0,0);return}
+let tfind=null,gf={q:'',hits:[],i:-1,leaves:[],until:0};
+function gfClear(root){root.querySelectorAll('mark.thl').forEach(m=>m.replaceWith(document.createTextNode(m.textContent)));root.normalize();root.querySelectorAll('.thit,.thit-on').forEach(el=>el.classList.remove('thit','thit-on'))}
+function gfMark(el,w){const re=twre(w),tw=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),ns=[];while(tw.nextNode())ns.push(tw.currentNode);ns.forEach(n=>{const t=n.nodeValue;re.lastIndex=0;if(!re.test(t))return;re.lastIndex=0;const f=document.createDocumentFragment();let p=0,m;while((m=re.exec(t))){if(m.index>p)f.append(t.slice(p,m.index));const k=document.createElement('mark');k.className='thl';k.textContent=m[0];f.append(k);p=m.index+m[0].length;if(!m[0].length)re.lastIndex++}if(p<t.length)f.append(t.slice(p));n.replaceWith(f)})}
+function gfApply(q,jump){const root=$('.tbodyart');if(!root)return;gfClear(root);const w=twords(q);gf={q,hits:[],i:-1,leaves:tleaves(root),until:0};
+if(q.trim().length>=2&&w.length)gf.leaves.forEach((el,i)=>{const l=tnorm(ttext(el));if(w.every(x=>l.includes(x))){gf.hits.push(i);el.classList.add('thit');gfMark(el,w)}});
+if(gf.hits.length){const k=jump!=null?gf.hits.indexOf(jump):-1;gf.i=k>-1?k:0;gfGo(jump!=null)}else gfBar()}
+function gfBar(){const c=$('#gfc');if(!c)return;const q=gf.q.trim();c.textContent=q.length<2?'':gf.hits.length?`${gf.i+1} of ${gf.hits.length}`:'No matches';main.querySelectorAll('[data-gf]').forEach(b=>b.disabled=gf.hits.length<2)}
+function gfScroll(el,smooth){const h=document.querySelector('header'),fb=$('.tfind'),off=(h?h.getBoundingClientRect().bottom:0)+(fb?fb.offsetHeight:0)+16;scrollTo({top:Math.max(0,el.getBoundingClientRect().top+scrollY-off),behavior:smooth?'smooth':'auto'})}
+function gfGo(fromSearch){gf.leaves.forEach(el=>el.classList.remove('thit-on'));const el=gf.leaves[gf.hits[gf.i]];if(!el)return;el.classList.add('thit-on');gfScroll(el,!fromSearch);gfBar();
+gf.until=Date.now()+5000;const root=$('.tbodyart');root.querySelectorAll('img').forEach(i=>{i.loading='eager';if(!i.complete)i.addEventListener('load',()=>{if(Date.now()<gf.until&&el.isConnected)gfScroll(el,false)},{once:true})})}
+function gfStep(d){if(!gf.hits.length)return;gf.i=(gf.i+d+gf.hits.length)%gf.hits.length;gfGo(false)}
+['wheel','touchmove','keydown'].forEach(ev=>addEventListener(ev,e=>{if(ev!=='keydown'||['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(e.key))gf.until=0},{passive:true}));
+main.addEventListener('click',e=>{const g=e.target.closest('[data-gf]');if(g){gfStep(+g.dataset.gf);return}const r=e.target.closest('[data-tread]');if(r){treadId=r.dataset.tread;tfind=r.dataset.hit!=null&&tq.trim().length>=2?{q:tq.trim(),hit:+r.dataset.hit}:null;view='tread';render();return}if(e.target.closest('[data-tback]')){view='training';render();scrollTo(0,0);return}
 const a=e.target.closest('.ta-toc a');if(a){e.preventDefault();jumpTo(a.getAttribute('href'))}});
-function jumpTo(sel){const el=document.querySelector(sel);if(!el)return;const h=document.querySelector('header'),off=(h?h.getBoundingClientRect().bottom:0)+10;scrollTo({top:el.getBoundingClientRect().top+scrollY-off,behavior:'smooth'})}
+function jumpTo(sel){const el=document.querySelector(sel);if(!el)return;const h=document.querySelector('header'),fb=document.querySelector('.tfind'),off=(h?h.getBoundingClientRect().bottom:0)+(fb?fb.offsetHeight:0)+10;scrollTo({top:el.getBoundingClientRect().top+scrollY-off,behavior:'smooth'})}
 boot();
 </script></body></html>

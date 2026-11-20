@@ -99,6 +99,37 @@ html,body{overflow-x:clip}
 .tfind .tfc{font-size:12px;color:var(--mute);white-space:nowrap;min-width:52px;text-align:right;font-weight:600}
 .tfind button{flex:none;width:38px;padding:8px 0;margin:0;font-weight:700}
 .tfind button:disabled{opacity:.4}
+.pz{max-width:1100px;margin:0 auto}
+.pz-head{margin:2px 0 10px}.pz-saved{color:#0f8f7e;font-weight:600;margin-left:4px}
+.pz-read{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;min-height:42px;background:#151d38;color:#fff;border-radius:10px 10px 0 0;padding:9px 14px;font-size:14px;font-variant-numeric:tabular-nums}
+.pz-read b{color:#5fd4c4;margin-right:2px}.pz-read .off{opacity:.45}.pz-hint{color:#c9d2ef;font-size:13px}
+.pz-wrap{position:relative;background:#fff;border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;overflow:hidden}
+.pz-wrap svg{display:block;width:100%;height:auto;touch-action:none;user-select:none;-webkit-user-select:none;cursor:crosshair}
+.pz-wrap:fullscreen{display:flex;align-items:center;justify-content:center;background:#fff;border:0;border-radius:0}
+.pz-wrap:fullscreen svg{width:auto;height:auto;max-width:100vw;max-height:100vh}
+.pz-fs{position:absolute;top:8px;right:8px;width:38px;height:38px;padding:0;font-size:19px;line-height:1;background:#fff;margin:0}
+.pz-bar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 10px}.pz-bar button{width:auto;margin:0;font-weight:600}
+.pz-tog[aria-pressed="true"]{background:#e07f30;border-color:#e07f30;color:#fff}
+.pz-lines{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:14px;margin:0 0 14px}
+.pz-lines b{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+.pz-lines label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.pz-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:760px){.pz-grid{grid-template-columns:1fr}}
+.pz-card{background:var(--surf);border:1px solid var(--line);border-radius:12px;padding:14px}
+.pz-card h3{font:800 16px "Plus Jakarta Sans",system-ui,sans-serif;margin:0 0 10px;color:var(--ink)}
+.pz-form{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+.pz-form label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:var(--mute)}
+.pz-form input,.pz-form select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:15px;color:var(--ink);background:#fff;font-weight:400;width:100%;min-width:0}
+.pz-add{margin-top:10px;width:auto;background:#e07f30;border-color:#e07f30;color:#fff;font-weight:700}
+.pz-err{color:#b42318;font-size:13px;margin:6px 0 0;min-height:1em}
+.pz-tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.pz-t{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums;background:#fff}
+.pz-t th{position:static;background:#151d38;color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.05em;text-align:left;padding:8px 9px;white-space:nowrap}
+.pz-t td{position:static;padding:7px 9px;border-top:1px solid var(--line);white-space:nowrap;background:#fff}
+.pz-t tbody tr:nth-child(even) td{background:#f4f6fb}
+.pz-c{display:flex;align-items:center;gap:6px}
+.pz-dot{flex:none;width:11px;height:11px;border-radius:50%}
+.pz-lab{width:86px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;font:inherit;font-weight:700}
+.pz-del{padding:3px 8px;margin:0;width:auto;font-size:12px}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script>window.supabase||document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"><\/script>')</script></head><body class="locked">
 <div id="gate"><img class="gatelogo" src="logo.png" alt="Ideal Impact Inc."><h1>OFT Team Board</h1><p class="sub" id="gmsg">Sign in with your company Google account.</p><button class="primary" id="gbtn" style="max-width:280px">Continue with Google</button></div>
 <header><img class="brandlogo" src="logo.png" alt="Ideal Impact Inc."><h1>OFT Team Board</h1><p class="sub">Rate your team and rank their growth.</p>
@@ -130,11 +161,12 @@ function card(i,rank){const a=avg(i),b=band(a);return `<div class="cardtop">${gr
 function applyFilter(){const t=q.trim().toLowerCase();document.querySelectorAll('.canvas .card').forEach(c=>c.classList.toggle('dim',!!t&&!names[+c.dataset.person].toLowerCase().includes(t)))}
 function scored(){return state.scores.flat().filter(x=>x!=='').length}
 function render(){syncFuture();updateProg();
-document.querySelectorAll('nav button').forEach(b=>{const on=b.dataset.view===(view==='tread'?'training':view);b.classList.toggle('active',on);b.setAttribute('aria-pressed',on)});$('#undo').disabled=!history.length;
+document.querySelectorAll('nav button').forEach(b=>{const on=b.dataset.view===(view==='tread'||view==='psy'?'training':view);b.classList.toggle('active',on);b.setAttribute('aria-pressed',on)});$('#undo').disabled=!history.length;
 if(view==='dash'){renderDash();return}
 if(view==='people'){renderPeople();return}
 if(view==='training'){renderTraining();return}
 if(view==='tread'){renderTRead();return}
+if(view==='psy'){renderPsy();return}
 if(view==='behaviors'){renderBehaviors();return}
 if(view==='comments'){renderComments();return}
 if(view==='guide'){renderGuide();return}
@@ -321,16 +353,146 @@ function tbuild(){if(tidx&&tidx.src===tcache)return tidx;const P=new DOMParser()
 function tsearch(q){const w=twords(q);if(!w.length)return[];return tbuild().map(g=>({g,hits:g.blocks.map((b,i)=>w.every(x=>b.l.includes(x))?i:-1).filter(i=>i>-1)})).filter(r=>r.hits.length||w.every(x=>r.g.all.includes(x)))}
 function thl(t,w){const re=twre(w);let o='',p=0,m;while((m=re.exec(t))){o+=esc(t.slice(p,m.index))+'<mark>'+esc(m[0])+'</mark>';p=m.index+m[0].length;if(!m[0].length)re.lastIndex++}return o+esc(t.slice(p))}
 function tsnip(t,w){const l=t.toLowerCase();let i=Math.min(...w.map(x=>{const k=l.indexOf(x);return k<0?1e9:k}));if(i>=1e9)i=0;const a=Math.max(0,i-60),b=Math.min(t.length,i+140);let s=t.slice(a,b);if(a)s=s.replace(/^\S*\s/,'');if(b<t.length)s=s.replace(/\s\S*$/,'');return(a?'… ':'')+thl(s,w)+(b<t.length?' …':'')}
-function tupdate(){const R=$('#tres'),L=$('#tlistw');if(!R||!L)return;const q=tq.trim();if(q.length<2){R.innerHTML='';L.innerHTML=tlistHTML(tcache);return}
-const w=twords(q),res=tsearch(q),n=res.reduce((s,r)=>s+r.hits.length,0);L.innerHTML='';
-if(!res.length){R.innerHTML=`<p class="tres-sum">No matches for “${esc(q)}”. Try fewer or different words.</p>`;return}
+const TTOOL=`<div class="titem"><span class="ticon" style="background:#e3f4f1;color:#0b5f54">CHART</span><div class="tbody"><b>Psychrometric chart</b><p>Read any air condition, plot points and processes, and mix airstreams. Your chart is saved to your account.</p></div><div class="tacts"><button class="primary" data-psy>Open</button></div></div>`;
+const TTOOLKW='psychrometric chart psychro tool calculator enthalpy wet bulb wetbulb dry bulb dew point relative humidity rh grains humidity ratio specific volume mixed air mixing airstreams outside air return air sensible latent shr coil';
+function tupdate(){const R=$('#tres'),L=$('#tlistw');if(!R||!L)return;const q=tq.trim();if(q.length<2){R.innerHTML='';L.innerHTML=`<div class="tcat">Tools</div><div class="tlist">${TTOOL}</div>`+tlistHTML(tcache);return}
+const w=twords(q),res=tsearch(q),n=res.reduce((s,r)=>s+r.hits.length,0),toolHit=w.every(x=>TTOOLKW.includes(x));L.innerHTML=toolHit?`<div class="tcat">Tools</div><div class="tlist">${TTOOL}</div>`:'';
+if(!res.length){R.innerHTML=toolHit?'':`<p class="tres-sum">No matches for “${esc(q)}”. Try fewer or different words.</p>`;return}
 R.innerHTML=`<p class="tres-sum">${n?`${n} match${n===1?'':'es'} in ${res.filter(r=>r.hits.length).length} guide${res.filter(r=>r.hits.length).length===1?'':'s'}`:'Matches found'} for “${esc(q)}”</p>`+res.map(r=>{const x=r.g.x,all=topen.has(x.id),show=all?r.hits:r.hits.slice(0,6);
 return`<div class="tres-g"><div class="tres-h"><div><b>${thl(x.title,w)}</b><span>${r.hits.length?`${r.hits.length} match${r.hits.length===1?'':'es'}`:'Matches the title or description'}</span></div>${x.body?`<button class="tres-go" data-tread="${esc(x.id)}"${r.hits.length?` data-hit="${r.hits[0]}"`:''}>Open guide</button>`:x.file_path?`<button class="tres-go" data-topen="${esc(x.id)}">Open</button>`:''}</div>
 ${show.map(i=>{const b=r.g.blocks[i];return`<button class="tres-hit" data-tread="${esc(x.id)}" data-hit="${i}"><small>${esc(b.h.length>80?b.h.slice(0,78)+'…':b.h)}</small><span>${tsnip(b.t,w)}</span></button>`}).join('')}
 ${r.hits.length>show.length?`<button class="tres-more" data-tmore="${esc(x.id)}">Show all ${r.hits.length} matches</button>`:''}</div>`}).join('')}
 main.addEventListener('input',e=>{if(e.target.id==='tq'){tq=e.target.value;clearTimeout(tqT);tqT=setTimeout(tupdate,120)}else if(e.target.id==='gfq'){clearTimeout(tqT);const v=e.target.value;tqT=setTimeout(()=>gfApply(v),120)}});
 main.addEventListener('keydown',e=>{if(e.key!=='Enter')return;if(e.target.id==='tq'){e.preventDefault();clearTimeout(tqT);tupdate();const f=$('#tres .tres-hit, #tres .tres-go');if(f)f.click()}else if(e.target.id==='gfq'){e.preventDefault();clearTimeout(tqT);if(tnorm(e.target.value)!==tnorm(gf.q))gfApply(e.target.value);else gfStep(e.shiftKey?-1:1)}});
-main.addEventListener('click',e=>{const m=e.target.closest('[data-tmore]');if(m){topen.add(m.dataset.tmore);tupdate()}});
+main.addEventListener('click',e=>{const m=e.target.closest('[data-tmore]');if(m){topen.add(m.dataset.tmore);tupdate();return}if(e.target.closest('[data-psy]')){view='psy';render();scrollTo(0,0)}});
+/* ===== Psychrometric chart tool (sea level, IP units) ===== */
+const PZ_P=14.696,PZ={L:70,R:850,T:30,B:612,TMIN:30,TMAX:120,WMAX:0.030};
+const PZC={ink:'#1f2933',grid:'#e3e8ef',rh:'#1c6fb5',wb:'#2b8a3e',h:'#c2500e',v:'#7a3fc4',dp:'#0b7285',sat:'#1f2933'};
+const PZ_LINES=[['rh','Relative humidity'],['wb','Wet bulb'],['h','Enthalpy'],['v','Specific volume'],['dp','Dew point'],['w','Humidity ratio']];
+const PZ_COLORS=['#e07f30','#1c3f95','#b42318','#0f8f7e','#7a3fc4','#b8670b','#0b7285','#151d38'];
+function pzPws(t){const T=t+459.67;if(t<32)return Math.exp(-1.0214165e4/T-4.8932428-5.3765794e-3*T+1.9202377e-7*T*T+3.5575832e-10*T**3-9.0344688e-14*T**4+4.1635019*Math.log(T));return Math.exp(-1.0440397e4/T-11.29465-2.7022355e-2*T+1.289036e-5*T*T-2.4780681e-9*T**3+6.5459673*Math.log(T))}
+const pzWfromPw=pw=>0.621945*pw/(PZ_P-pw);
+const pzPwFromW=w=>PZ_P*w/(0.621945+w);
+const pzWs=t=>pzWfromPw(pzPws(t));
+const pzH=(t,w)=>0.24*t+w*(1061+0.444*t);
+const pzV=(t,w)=>0.370486*(t+459.67)*(1+1.607858*w)/PZ_P;
+const pzRH=(t,w)=>pzPwFromW(w)/pzPws(t);
+function pzDP(w){if(w<=1e-7)return NaN;const pw=pzPwFromW(w);let a=-80,b=200;for(let i=0;i<60;i++){const m=(a+b)/2;pzPws(m)<pw?a=m:b=m}return(a+b)/2}
+function pzWfromWB(t,wb){const ws=pzWs(wb);return wb>=32?((1093-0.556*wb)*ws-0.24*(t-wb))/(1093+0.444*t-wb):((1220-0.04*wb)*ws-0.24*(t-wb))/(1220+0.444*t-0.48*wb)}
+function pzWB(t,w){let a=-60,b=t;for(let i=0;i<60;i++){const m=(a+b)/2;pzWfromWB(t,m)>w?b=m:a=m}return(a+b)/2}
+const pzTfromH=(h,w)=>(h-1061*w)/(0.24+0.444*w);
+function pzProps(t,w){return{db:t,w,gr:w*7000,rh:pzRH(t,w)*100,wb:pzWB(t,w),dp:pzDP(w),h:pzH(t,w),v:pzV(t,w)}}
+const pzX=t=>PZ.L+(t-PZ.TMIN)/(PZ.TMAX-PZ.TMIN)*(PZ.R-PZ.L);
+const pzY=w=>PZ.B-w/PZ.WMAX*(PZ.B-PZ.T);
+const pzT=x=>PZ.TMIN+(x-PZ.L)/(PZ.R-PZ.L)*(PZ.TMAX-PZ.TMIN);
+const pzWy=y=>(PZ.B-y)/(PZ.B-PZ.T)*PZ.WMAX;
+const pzF=n=>Math.round(n*10)/10;
+function pzPath(pts){return pts.filter(p=>isFinite(p[0])&&isFinite(p[1])).map((p,i)=>(i?'L':'M')+pzF(pzX(p[0]))+' '+pzF(pzY(p[1]))).join('')}
+function pzTsat(w){let a=-60,b=200;for(let i=0;i<60;i++){const m=(a+b)/2;pzWs(m)<w?a=m:b=m}return(a+b)/2}
+function pzText(x,y,s,o={}){return`<text x="${pzF(x)}" y="${pzF(y)}" font-family="Inter,system-ui,sans-serif" font-size="${o.size||11}" fill="${o.fill||PZC.ink}" text-anchor="${o.anchor||'middle'}"${o.weight?` font-weight="${o.weight}"`:''}${o.rot!=null?` transform="rotate(${pzF(o.rot)} ${pzF(x)} ${pzF(y)})"`:''}${o.base?` dominant-baseline="${o.base}"`:''}>${s}</text>`}
+function pzAngle(a,b){return Math.atan2(pzY(b[1])-pzY(a[1]),pzX(b[0])-pzX(a[0]))*180/Math.PI}
+function pzChartSVG(hidden){const on=k=>!hidden.includes(k),o=[];const tTop=pzTsat(PZ.WMAX);
+const sat=[];for(let t=PZ.TMIN;t<=tTop;t+=0.5)sat.push([t,pzWs(t)]);sat.push([tTop,PZ.WMAX]);
+const clip=pzPath([[PZ.TMIN,0],...sat,[PZ.TMAX,PZ.WMAX],[PZ.TMAX,0]])+'Z';
+o.push(`<defs><clipPath id="pzclip"><path d="${clip}"/></clipPath><marker id="pzarr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#151d38"/></marker></defs>`);
+o.push(`<rect x="0" y="0" width="1000" height="680" fill="#fff"/>`);
+o.push(`<g clip-path="url(#pzclip)">`);
+for(let t=PZ.TMIN;t<=PZ.TMAX;t+=5)o.push(`<line x1="${pzF(pzX(t))}" y1="${PZ.T}" x2="${pzF(pzX(t))}" y2="${PZ.B}" stroke="${PZC.grid}" stroke-width="${t%10?0.6:1}"/>`);
+if(on('w'))for(let g=0;g<=210;g+=10)o.push(`<line x1="${PZ.L}" y1="${pzF(pzY(g/7000))}" x2="${PZ.R}" y2="${pzF(pzY(g/7000))}" stroke="${PZC.grid}" stroke-width="0.7"/>`);
+if(on('v'))for(let v=12.5;v<=15.0001;v+=0.5){const pts=[];for(let t=PZ.TMIN;t<=PZ.TMAX;t+=1){const w=(v*PZ_P/(0.370486*(t+459.67))-1)/1.607858;pts.push([t,w])}o.push(`<path d="${pzPath(pts.filter(p=>p[1]>=-0.001&&p[1]<=PZ.WMAX+0.002))}" fill="none" stroke="${PZC.v}" stroke-width="1" stroke-dasharray="2 4"/>`)}
+if(on('h'))for(let h=10;h<=55;h+=5){const pts=[];for(let t=PZ.TMIN-5;t<=PZ.TMAX;t+=1)pts.push([t,(h-0.24*t)/(1061+0.444*t)]);o.push(`<path d="${pzPath(pts.filter(p=>p[1]>=-0.002&&p[1]<=PZ.WMAX+0.002))}" fill="none" stroke="${PZC.h}" stroke-width="1" stroke-dasharray="7 4"/>`)}
+if(on('wb'))for(let wb=30;wb<=85;wb+=5){const pts=[];for(let t=wb;t<=PZ.TMAX;t+=0.5){const w=pzWfromWB(t,wb);pts.push([t,w]);if(w<0)break}o.push(`<path d="${pzPath(pts)}" fill="none" stroke="${PZC.wb}" stroke-width="1"/>`)}
+if(on('rh'))for(let r=10;r<=90;r+=10){const pts=[];for(let t=PZ.TMIN;t<=PZ.TMAX;t+=0.5)pts.push([t,pzWfromPw(r/100*pzPws(t))]);o.push(`<path d="${pzPath(pts)}" fill="none" stroke="${PZC.rh}" stroke-width="${r===50?1.5:1.1}"/>`)}
+o.push(`</g>`);
+o.push(`<path d="${pzPath(sat)}" fill="none" stroke="${PZC.sat}" stroke-width="2.2"/>`);
+o.push(`<path d="M${PZ.L} ${PZ.B}H${PZ.R}V${PZ.T}" fill="none" stroke="${PZC.ink}" stroke-width="1.4"/>`);
+/* labels */
+if(on('rh'))for(let r=10;r<=90;r+=10){let t=PZ.TMAX-6;while(pzWfromPw(r/100*pzPws(t))>PZ.WMAX*0.96&&t>PZ.TMIN)t-=1;const w=pzWfromPw(r/100*pzPws(t)),a=pzAngle([t-1,pzWfromPw(r/100*pzPws(t-1))],[t+1,pzWfromPw(r/100*pzPws(t+1))]);o.push(`<rect x="${pzF(pzX(t)-12)}" y="${pzF(pzY(w)-7)}" width="24" height="13" rx="3" fill="#fff" opacity=".85" transform="rotate(${pzF(a)} ${pzF(pzX(t))} ${pzF(pzY(w))})"/>`+pzText(pzX(t),pzY(w)+4,r+'%',{fill:PZC.rh,size:10.5,weight:700,rot:a}))}
+if(on('wb'))for(let wb=30;wb<=85;wb+=5){const ws=pzWs(wb);if(ws>PZ.WMAX)continue;o.push(pzText(pzX(wb)-6,pzY(ws)-5,wb,{fill:PZC.wb,size:10.5,weight:700,anchor:'end'}))}
+if(on('h'))for(let h=10;h<=55;h+=5){let t=PZ.TMIN-5,w;for(;t<=PZ.TMAX;t+=0.25){w=(h-0.24*t)/(1061+0.444*t);if(w<=pzWs(t)&&w>=0)break}if(t>PZ.TMAX||w>PZ.WMAX||t<PZ.TMIN+4)continue;const tl=t-6,wl=(h-0.24*tl)/(1061+0.444*tl);if(wl>PZ.WMAX)continue;const a=pzAngle([tl,wl],[tl+3,(h-0.24*(tl+3))/(1061+0.444*(tl+3))]);o.push(`<line x1="${pzF(pzX(t))}" y1="${pzF(pzY(w))}" x2="${pzF(pzX(tl+1.6))}" y2="${pzF(pzY((h-0.24*(tl+1.6))/(1061+0.444*(tl+1.6))))}" stroke="${PZC.h}" stroke-width="1" stroke-dasharray="2 2"/>`+pzText(pzX(tl),pzY(wl)+4,h,{fill:PZC.h,size:10.5,weight:700,rot:a}))}
+if(on('v'))for(let v=12.5;v<=15.0001;v+=0.5){const t=v*PZ_P/0.370486-459.67;if(t<PZ.TMIN||t>PZ.TMAX)continue;o.push(pzText(pzX(t)+3,PZ.B-6,v.toFixed(1),{fill:PZC.v,size:10,weight:700,anchor:'start',rot:-72}))}
+for(let t=PZ.TMIN;t<=PZ.TMAX;t+=5){o.push(`<line x1="${pzF(pzX(t))}" y1="${PZ.B}" x2="${pzF(pzX(t))}" y2="${PZ.B+(t%10?4:7)}" stroke="${PZC.ink}"/>`);if(t%10===0)o.push(pzText(pzX(t),PZ.B+20,t,{size:11.5}))}
+o.push(pzText((PZ.L+PZ.R)/2,PZ.B+42,'Dry-bulb temperature (°F)',{size:13,weight:700}));
+if(on('w')){for(let g=0;g<=210;g+=10){const y=pzY(g/7000);o.push(`<line x1="${PZ.R}" y1="${pzF(y)}" x2="${PZ.R+(g%20?4:7)}" y2="${pzF(y)}" stroke="${PZC.ink}"/>`);if(g%20===0)o.push(pzText(PZ.R+11,y+4,g,{size:11,anchor:'start'}))}o.push(pzText(PZ.R+48,(PZ.T+PZ.B)/2,'Humidity ratio (grains / lb dry air)',{size:12.5,weight:700,rot:-90}))}
+if(on('dp')){const x=PZ.R+82;o.push(`<line x1="${x}" y1="${PZ.B}" x2="${x}" y2="${PZ.T}" stroke="${PZC.dp}" stroke-width="1.4"/>`);for(let d=30;d<=89;d+=5){const y=pzY(pzWs(d));if(y<PZ.T)break;o.push(`<line x1="${x}" y1="${pzF(y)}" x2="${x+6}" y2="${pzF(y)}" stroke="${PZC.dp}"/>`+pzText(x+10,y+4,d,{size:11,anchor:'start',fill:PZC.dp,weight:700}))}o.push(pzText(x+46,(PZ.T+PZ.B)/2,'Dew point (°F)',{size:12.5,weight:700,rot:-90,fill:PZC.dp}))}
+/* title + legend */
+o.push(pzText(PZ.L+14,PZ.T+26,'Psychrometric chart',{size:22,weight:800,anchor:'start'})+pzText(PZ.L+14,PZ.T+46,'Sea level (14.696 psia) · IP units',{size:12,anchor:'start',fill:'#52606d'}));
+let ly=PZ.T+70;[['rh','Relative humidity (%)',PZC.rh,''],['wb','Wet-bulb temperature (°F)',PZC.wb,''],['h','Enthalpy (Btu / lb dry air)',PZC.h,'7 4'],['v','Specific volume (ft³ / lb dry air)',PZC.v,'2 4'],['dp','Dew point (°F) — read across to the right',PZC.dp,'']].forEach(([k,l,c,d])=>{if(!on(k))return;o.push(`<line x1="${PZ.L+14}" y1="${ly}" x2="${PZ.L+42}" y2="${ly}" stroke="${c}" stroke-width="2"${d?` stroke-dasharray="${d}"`:''}/>`+pzText(PZ.L+50,ly+4,l,{size:11.5,anchor:'start'}));ly+=18});
+return o.join('')}
+/* ---- state, saving ---- */
+let pz=null,pzSaveT=0,pzDrag=null,pzDown=null;
+function pzDefault(){return{points:[],hidden:[],connect:true,tap:false}}
+async function pzLoad(){if(pz)return pz;pz=pzDefault();try{const{data}=await sb.from('psy_charts').select('data').eq('user_id',me.id).maybeSingle();if(data&&data.data)pz=Object.assign(pzDefault(),data.data)}catch(e){}return pz}
+function pzSave(){const s=$('#pzsaved');if(s)s.textContent='Saving…';clearTimeout(pzSaveT);pzSaveT=setTimeout(async()=>{const{error}=await sb.from('psy_charts').upsert({user_id:me.id,data:pz,updated_at:new Date().toISOString()});const s2=$('#pzsaved');if(s2)s2.textContent=error?'Not saved — '+error.message:'Saved to your account'},700)}
+/* ---- page ---- */
+const pzN=(n,d=1)=>isFinite(n)?n.toFixed(d):'–';
+function pzRow(p){const q=pzProps(p.t,p.w);return q}
+async function renderPsy(){main.innerHTML='<p class="hint">Loading chart…</p>';await pzLoad();if(view!=='psy')return;
+main.innerHTML=`<div class="pz"><button class="tback" data-tback>← All training</button>
+<div class="pz-head"><div><h2 class="gname" style="margin:0">Psychrometric chart</h2><p class="hint" style="margin:4px 0 0">Drag across the chart to read any point. Plot states by typing two values or turning on <b>Tap to plot</b>. <span id="pzsaved" class="pz-saved"></span></p></div></div>
+<div class="pz-read" id="pzread" aria-live="off"><span class="pz-hint">Point at the chart to read DB, RH, grains, WB, DP, enthalpy and volume.</span></div>
+<div class="pz-wrap" id="pzwrap"><svg id="pzsvg" viewBox="0 0 1000 680" role="img" aria-label="Psychrometric chart"><g id="pzbg"></g><g id="pzfg"></g><g id="pzcur"></g></svg>
+<button class="pz-fs" id="pzfs" type="button" title="Full screen" aria-label="Full screen">⤢</button></div>
+<div class="pz-bar"><button type="button" id="pztap" class="pz-tog" aria-pressed="${pz.tap}">✚ Tap to plot</button><button type="button" id="pzcon" class="pz-tog" aria-pressed="${pz.connect}">↗ Connect points</button><button type="button" id="pzpng">Export image</button><button type="button" id="pzclr">Clear points</button></div>
+<div class="pz-lines"><b>Chart lines</b>${PZ_LINES.map(([k,l])=>`<label><input type="checkbox" data-pzl="${k}"${pz.hidden.includes(k)?'':' checked'}> ${l}</label>`).join('')}</div>
+<div class="pz-grid"><div class="pz-card"><h3>Add a point</h3>
+<div class="pz-form"><label>Label<input id="pzlab" maxlength="14" placeholder="e.g. OA, RA, Supply"></label>
+<label>Known values<select id="pzpair"><option value="rh">Dry bulb + RH</option><option value="wb">Dry bulb + wet bulb</option><option value="dp">Dry bulb + dew point</option><option value="gr">Dry bulb + grains</option></select></label>
+<label>Dry bulb (°F)<input id="pzdb" type="number" inputmode="decimal" step="any" placeholder="75"></label>
+<label id="pzv2l">RH (%)<input id="pzv2" type="number" inputmode="decimal" step="any" placeholder="50"></label></div>
+<button type="button" class="pz-add" id="pzadd">Plot point</button><p class="pz-err" id="pzerr"></p></div>
+<div class="pz-card"><h3>Mix two airstreams</h3><p class="hint" style="margin:0 0 8px">E.g. outdoor air with return air. Mixing is by mass of dry air.</p>
+<div class="pz-form"><label>Stream A<select id="pzma"></select></label><label>Stream B<select id="pzmb"></select></label><label>% of A<input id="pzmp" type="number" inputmode="decimal" min="0" max="100" step="any" value="20"></label></div>
+<button type="button" class="pz-add" id="pzmix">Add mixed point</button><p class="pz-err" id="pzmerr"></p></div></div>
+<div class="pz-card" style="margin-top:12px"><h3>Plotted points</h3><div id="pztab"></div></div>
+<p class="hint" style="font-size:12px;margin-top:10px">Calculated with ASHRAE Fundamentals formulas at sea level. Drag a plotted point on the chart to move it.</p></div>`;
+$('#pzbg').innerHTML=pzChartSVG(pz.hidden);pzDraw();pzPair();pzSaved()}
+function pzSaved(){const s=$('#pzsaved');if(s&&!s.textContent)s.textContent=pz.points.length?'Saved to your account':''}
+function pzPair(){const k=($('#pzpair')||{}).value,l=$('#pzv2l');if(!l)return;const t={rh:['RH (%)','50'],wb:['Wet bulb (°F)','62.5'],dp:['Dew point (°F)','55'],gr:['Grains (gr/lb)','65']}[k];l.firstChild.nodeValue=t[0];$('#pzv2').placeholder=t[1]}
+function pzDraw(){const fg=$('#pzfg');if(!fg)return;const P=pz.points,o=[];
+if(pz.connect)for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i];o.push(`<line x1="${pzF(pzX(a.t))}" y1="${pzF(pzY(a.w))}" x2="${pzF(pzX(b.t))}" y2="${pzF(pzY(b.w))}" stroke="#151d38" stroke-width="2.4" marker-end="url(#pzarr)" opacity=".85"/>`)}
+P.forEach((p,i)=>{const x=pzX(p.t),y=pzY(p.w),c=PZ_COLORS[i%PZ_COLORS.length];o.push(`<g data-pt="${p.id}" style="cursor:grab"><circle cx="${pzF(x)}" cy="${pzF(y)}" r="16" fill="transparent"/><circle cx="${pzF(x)}" cy="${pzF(y)}" r="7" fill="${c}" stroke="#fff" stroke-width="2.5"/>`+pzText(x+11,y-10,esc(p.label||String(i+1)),{size:13,weight:800,anchor:'start',fill:c})+`</g>`)});
+fg.innerHTML=o.join('');pzTable();pzMixOpts()}
+function pzTable(){const el=$('#pztab');if(!el)return;const P=pz.points;if(!P.length){el.innerHTML='<p class="hint" style="margin:0">No points yet. Add one above, or turn on <b>Tap to plot</b> and tap the chart.</p>';return}
+let h=`<div class="pz-tw"><table class="pz-t"><thead><tr><th>Point</th><th>DB °F</th><th>WB °F</th><th>RH %</th><th>DP °F</th><th>gr/lb</th><th>h Btu/lb</th><th>v ft³/lb</th><th></th></tr></thead><tbody>`;
+P.forEach((p,i)=>{const q=pzProps(p.t,p.w),c=PZ_COLORS[i%PZ_COLORS.length];h+=`<tr><td><div class="pz-c"><span class="pz-dot" style="background:${c}"></span><input class="pz-lab" data-pzlab="${p.id}" value="${esc(p.label||'')}" placeholder="${i+1}" maxlength="14" aria-label="Point label"></div></td><td>${pzN(q.db)}</td><td>${pzN(q.wb)}</td><td>${pzN(q.rh,0)}</td><td>${pzN(q.dp)}</td><td>${pzN(q.gr)}</td><td>${pzN(q.h)}</td><td>${pzN(q.v,2)}</td><td><button class="pz-del" data-pzdel="${p.id}" aria-label="Remove point">✕</button></td></tr>`});
+h+='</tbody></table></div>';
+if(P.length>1&&pz.connect){h+=`<h3 style="margin-top:14px">Process steps</h3><div class="pz-tw"><table class="pz-t"><thead><tr><th>Step</th><th>ΔDB °F</th><th>Δgr/lb</th><th>Δh Btu/lb</th><th>Sensible</th><th>Latent</th><th>SHR</th></tr></thead><tbody>`;
+for(let i=1;i<P.length;i++){const a=pzProps(P[i-1].t,P[i-1].w),b=pzProps(P[i].t,P[i].w),dt=b.db-a.db,dh=b.h-a.h,cp=0.24+0.444*(a.w+b.w)/2,qs=cp*dt,ql=dh-qs,shr=Math.abs(dh)>0.05?qs/dh:NaN;
+h+=`<tr><td>${esc(P[i-1].label||String(i))} → ${esc(P[i].label||String(i+1))}</td><td>${pzN(dt)}</td><td>${pzN(b.gr-a.gr)}</td><td>${pzN(dh,2)}</td><td>${pzN(qs,2)}</td><td>${pzN(ql,2)}</td><td>${isFinite(shr)?shr.toFixed(2):'–'}</td></tr>`}
+h+=`</tbody></table></div><p class="hint" style="font-size:12px;margin:6px 0 0">Per lb of dry air. Multiply Δh by 4.5 × CFM for Btu/h (standard air). SHR = sensible ÷ total.</p>`}
+el.innerHTML=h}
+function pzMixOpts(){const a=$('#pzma'),b=$('#pzmb');if(!a)return;const o=pz.points.map((p,i)=>`<option value="${p.id}">${esc(p.label||String(i+1))}</option>`).join('');const va=a.value,vb=b.value;a.innerHTML=o||'<option value="">Plot 2 points first</option>';b.innerHTML=o||'<option value="">Plot 2 points first</option>';if(va)a.value=va;if(vb)b.value=vb;else if(pz.points[1])b.value=pz.points[1].id}
+function pzRead(t,w){const r=$('#pzread');if(!r)return;if(t==null){r.innerHTML='<span class="pz-hint">Point at the chart to read DB, RH, grains, WB, DP, enthalpy and volume.</span>';return}const q=pzProps(t,w),H=pz.hidden;
+const it=[[null,'DB',pzN(q.db)+' °F'],['rh','RH',pzN(q.rh,0)+'%'],['w','W',pzN(q.gr)+' gr/lb'],['wb','WB',pzN(q.wb)+' °F'],['dp','DP',isFinite(q.dp)?pzN(q.dp)+' °F':'–'],['h','h',pzN(q.h)+' Btu/lb'],['v','v',pzN(q.v,2)+' ft³/lb']];
+r.innerHTML=it.map(([k,l,v])=>`<span${k&&H.includes(k)?' class="off"':''}><b>${l}</b> ${v}</span>`).join('')}
+function pzLoc(e){const s=$('#pzsvg'),pt=s.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const p=pt.matrixTransform(s.getScreenCTM().inverse());return{x:p.x,y:p.y,t:pzT(p.x),w:pzWy(p.y)}}
+function pzIn(t,w){return t>=PZ.TMIN&&t<=PZ.TMAX&&w>=0&&w<=PZ.WMAX&&w<=pzWs(t)*1.0005}
+function pzClamp(t,w){t=Math.min(PZ.TMAX,Math.max(PZ.TMIN,t));w=Math.max(0,Math.min(w,PZ.WMAX,pzWs(t)));return[t,w]}
+function pzCursor(t,w){const c=$('#pzcur');if(!c)return;if(t==null){c.innerHTML='';return}const x=pzF(pzX(t)),y=pzF(pzY(w));c.innerHTML=`<line x1="${x}" y1="${PZ.B}" x2="${x}" y2="${y}" stroke="#e07f30" stroke-width="1" stroke-dasharray="3 3"/><line x1="${x}" y1="${y}" x2="${PZ.R}" y2="${y}" stroke="#e07f30" stroke-width="1" stroke-dasharray="3 3"/><circle cx="${x}" cy="${y}" r="4.5" fill="#e07f30" stroke="#fff" stroke-width="1.5"/>`}
+function pzAdd(t,w,label){const id=Math.random().toString(36).slice(2,9);pz.points.push({id,t:+t.toFixed(3),w:+w.toFixed(6),label:(label||'').slice(0,14)});pzDraw();pzSave()}
+main.addEventListener('pointerdown',e=>{const s=e.target.closest('#pzsvg');if(!s)return;const L=pzLoc(e),g=e.target.closest('[data-pt]');pzDown={x:e.clientX,y:e.clientY,at:Date.now()};if(g){pzDrag=g.dataset.pt;e.preventDefault()}s.setPointerCapture(e.pointerId);if(pzIn(L.t,L.w)){pzRead(L.t,L.w);pzCursor(L.t,L.w)}});
+main.addEventListener('pointermove',e=>{const s=e.target.closest('#pzsvg');if(!s||!pz)return;const L=pzLoc(e);if(pzDrag){const p=pz.points.find(x=>x.id===pzDrag);if(p){[p.t,p.w]=pzClamp(L.t,L.w);pzDraw();pzRead(p.t,p.w);pzCursor(p.t,p.w)}return}if(pzIn(L.t,L.w)){pzRead(L.t,L.w);pzCursor(L.t,L.w)}else if(e.pointerType==='mouse'){pzRead();pzCursor()}});
+main.addEventListener('pointerup',e=>{const s=e.target.closest('#pzsvg');if(!s||!pz)return;const L=pzLoc(e);if(pzDrag){pzDrag=null;pzSave();return}if(pzDown&&pz.tap&&Math.hypot(e.clientX-pzDown.x,e.clientY-pzDown.y)<8&&Date.now()-pzDown.at<600&&pzIn(L.t,L.w))pzAdd(L.t,L.w,'');pzDown=null;if(e.pointerType!=='mouse'){}});
+main.addEventListener('pointerleave',e=>{if(e.target.id==='pzsvg'&&!pzDrag){pzRead();pzCursor()}},true);
+main.addEventListener('change',e=>{const t=e.target;if(t.dataset.pzl){const k=t.dataset.pzl;pz.hidden=t.checked?pz.hidden.filter(x=>x!==k):[...pz.hidden,k];$('#pzbg').innerHTML=pzChartSVG(pz.hidden);pzDraw();pzSave()}else if(t.id==='pzpair')pzPair();else if(t.dataset.pzlab){const p=pz.points.find(x=>x.id===t.dataset.pzlab);if(p){p.label=t.value.slice(0,14);pzDraw();pzSave()}}});
+main.addEventListener('click',e=>{const t=e.target.closest('button');if(!t||!$('.pz'))return;
+if(t.id==='pztap'){pz.tap=!pz.tap;t.setAttribute('aria-pressed',pz.tap);pzSave()}
+else if(t.id==='pzcon'){pz.connect=!pz.connect;t.setAttribute('aria-pressed',pz.connect);pzDraw();pzSave()}
+else if(t.id==='pzclr'){if(pz.points.length&&confirm('Remove all plotted points from your chart?')){pz.points=[];pzDraw();pzSave()}}
+else if(t.dataset.pzdel){pz.points=pz.points.filter(x=>x.id!==t.dataset.pzdel);pzDraw();pzSave()}
+else if(t.id==='pzadd'){const er=$('#pzerr'),db=parseFloat($('#pzdb').value),v=parseFloat($('#pzv2').value),k=$('#pzpair').value;er.textContent='';
+if(!isFinite(db)||!isFinite(v)){er.textContent='Enter both values.';return}if(db<PZ.TMIN||db>PZ.TMAX){er.textContent=`Dry bulb must be between ${PZ.TMIN} and ${PZ.TMAX} °F.`;return}
+let w;if(k==='rh'){if(v<0||v>100){er.textContent='RH must be 0–100%.';return}w=pzWfromPw(v/100*pzPws(db))}else if(k==='wb'){if(v>db){er.textContent='Wet bulb can’t be above dry bulb.';return}w=pzWfromWB(db,v)}else if(k==='dp'){if(v>db){er.textContent='Dew point can’t be above dry bulb.';return}w=pzWfromPw(pzPws(v))}else w=v/7000;
+if(!(w>=0)){er.textContent='Those values give air drier than 0 grains — check them.';return}if(w>pzWs(db)*1.0005){er.textContent='Those values are past saturation (over 100% RH).';return}if(w>PZ.WMAX){er.textContent=`That's off the top of the chart (over ${PZ.WMAX*7000} gr/lb).`;return}
+pzAdd(db,w,$('#pzlab').value.trim());$('#pzlab').value='';$('#pzdb').value='';$('#pzv2').value=''}
+else if(t.id==='pzmix'){const er=$('#pzmerr'),A=pz.points.find(x=>x.id===$('#pzma').value),B=pz.points.find(x=>x.id===$('#pzmb').value),f=parseFloat($('#pzmp').value)/100;er.textContent='';
+if(!A||!B||A===B){er.textContent='Pick two different points.';return}if(!(f>=0&&f<=1)){er.textContent='% of A must be 0–100.';return}
+const w=f*A.w+(1-f)*B.w,h=f*pzH(A.t,A.w)+(1-f)*pzH(B.t,B.w);pzAdd(pzTfromH(h,w),w,'Mix')}
+else if(t.id==='pzpng')pzPNG();
+else if(t.id==='pzfs'){const w=$('#pzwrap');if(document.fullscreenElement)document.exitFullscreen();else if(w.requestFullscreen)w.requestFullscreen().then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape').catch(()=>{})).catch(()=>{})}});
+function pzPNG(){const s=$('#pzsvg').cloneNode(true);s.querySelector('#pzcur').innerHTML='';s.setAttribute('xmlns','http://www.w3.org/2000/svg');s.setAttribute('width','2000');s.setAttribute('height','1360');const url='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(s)),img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=2000;c.height=1360;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,2000,1360);x.drawImage(img,0,0,2000,1360);const a=document.createElement('a');a.download='psychrometric-chart.png';a.href=c.toDataURL('image/png');document.body.append(a);a.click();a.remove()};img.src=url}
+
 main.addEventListener('click',async e=>{if(view!=='training'&&view!=='tread')return;
 const o=e.target.closest('[data-topen]');if(o){const x=tcache.find(r=>r.id===o.dataset.topen);if(!x)return;const w=window.open('','_blank');o.textContent='Opening…';const{data,error}=await sb.storage.from('training').createSignedUrl(x.file_path,3600);o.textContent='Open';if(error||!data){if(w)w.close();alertMsg('Could not open the file: '+(error?error.message:'unknown error'));return}if(w)w.location=data.signedUrl;else location.href=data.signedUrl;return}
 const d=e.target.closest('[data-tdel]');if(d){if(!d.classList.contains('armed')){d.classList.add('armed');d.textContent='Tap again';setTimeout(()=>{d.classList.remove('armed');d.textContent='Remove'},4000);return}const x=tcache.find(r=>r.id===d.dataset.tdel);d.textContent='Removing…';if(x.file_path)await sb.storage.from('training').remove([x.file_path]);const{error}=await sb.from('training').delete().eq('id',x.id);tcache=null;renderTraining(error?'Could not remove: '+error.message:'Removed “'+x.title+'”.');return}
